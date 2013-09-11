@@ -45,7 +45,7 @@
                             </page>
                         </notebook>
                         <button string="Check Token Status" name="check_token_status" colspan="2"/>
-                        <button string="Import Orders" name="import_orders"
+                        <button string="Import Orders" name="import_orders_button"
                             colspan="2"/>
                     </form>
                 ]]>
