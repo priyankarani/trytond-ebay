@@ -87,7 +87,7 @@ class SellerAccount(ModelSQL, ModelView):
         """
         Set default last order import time
         """
-        return datetime.utcnow() - relativedelta(day=30)
+        return datetime.utcnow() - relativedelta(days=30)
 
     @staticmethod
     def default_default_uom():
@@ -111,9 +111,13 @@ class SellerAccount(ModelSQL, ModelView):
                 'All the ebay credentials should be unique.'
             )
         ]
+        cls._error_messages.update({
+            "no_orders": 'No new orders have been placed on eBay for this ' +
+                'seller account after %s'
+        })
         cls._buttons.update({
             'check_token_status': {},
-            'import_orders': {},
+            'import_orders_button': {},
         })
 
     def get_trading_api(self):
@@ -142,13 +146,56 @@ class SellerAccount(ModelSQL, ModelView):
 
     @classmethod
     @ModelView.button_action('ebay.import_orders')
-    def import_orders(cls, accounts):
+    def import_orders_button(cls, accounts):
         """
         Import orders for current account
 
         :param accounts: Active record list of seller accounts
         """
         pass
+
+    def import_orders(self):
+        """
+        Imports orders for current MWS account
+
+        :return: List of active records of sale
+        """
+        Sale = Pool().get('sale.sale')
+
+        sales = []
+        api = self.get_trading_api()
+        now = datetime.utcnow()
+
+        last_import_time = self.last_order_import_time
+
+        self.write([self], {'last_order_import_time': now})
+
+        response = api.execute(
+            'GetOrders', {
+                'CreateTimeFrom': last_import_time,
+                'CreateTimeTo': now
+            }
+        ).response_dict()
+        if not response.get('OrderArray'):
+            self.raise_user_error(
+                'no_orders', (last_import_time, )
+            )
+
+        # Orders are returned as dictionary for single order and as
+        # list for multiple orders.
+        # Convert to list if dictionary is returned
+        if isinstance(response['OrderArray']['Order'], dict):
+            orders = [response['OrderArray']['Order']]
+        else:
+            orders = response['OrderArray']['Order']
+
+        with Transaction().set_context(
+            {'ebay_seller_account': self.id}
+        ):
+            for order_data in orders:
+                sales.append(Sale.create_using_ebay_data(order_data))
+
+        return sales
 
 
 class CheckTokenStatusView(ModelView):
@@ -235,36 +282,10 @@ class ImportOrders(Wizard):
         """Handles the transition"""
 
         SellerAccount = Pool().get('ebay.seller.account')
-        Sale = Pool().get('sale.sale')
 
-        sales = []
         account = SellerAccount(Transaction().context.get('active_id'))
 
-        api = account.get_trading_api()
-        now = datetime.now()
-
-        response = api.execute(
-            'GetOrders', {
-                'CreateTimeFrom': account.last_order_import_time,
-                'CreateTimeTo': now
-            }
-        ).response_dict()
-
-        # Orders are returned as dictionary for single order and as
-        # list for multiple orders.
-        # Convert to list if dictionary is returned
-        if isinstance(response['OrderArray']['Order'], dict):
-            orders = [response['OrderArray']['Order']]
-        else:
-            orders = response['OrderArray']['Order']
-
-        with Transaction().set_context(
-            {'ebay_seller_account': account.id}
-        ):
-            self.write([account], {'last_order_import_time': now})
-
-            for order_data in orders:
-                sales.append(Sale.create_using_ebay_data(order_data))
+        sales = account.import_orders()
 
         action['pyson_domain'] = PYSONEncoder().encode([
             ('id', 'in', map(int, sales))
