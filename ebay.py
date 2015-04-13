@@ -2,7 +2,7 @@
 """
     ebay
 
-    :copyright: (c) 2013 by Openlabs Technologies & Consulting (P) Limited
+    :copyright: (c) 2013-2015 by Openlabs Technologies & Consulting (P) Limited
     :license: GPLv3, see LICENSE for more details.
 """
 import dateutil.parser
@@ -80,7 +80,7 @@ class SellerAccount(ModelSQL, ModelView):
         unit = UoM.search([
             ('name', '=', 'Unit'),
         ])
-        return unit and unit[0] or None
+        return unit and unit[0].id or None
 
     @classmethod
     def __setup__(cls):
