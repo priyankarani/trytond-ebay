@@ -230,7 +230,8 @@ class TestBase(unittest.TestCase):
 
         # TODO: This should work without creating new properties
         self.Property.create([{
-            'value': 'account.account' + ',' +
+            'value':
+                'account.account' + ',' +
                 str(self.ebay_seller_account.default_account_revenue.id),
             'res': None,
             'field': model_field.id,

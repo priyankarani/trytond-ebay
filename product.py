@@ -2,7 +2,7 @@
 '''
     product
 
-    :copyright: (c) 2013 by Openlabs Technologies & Consulting (P) Limited
+    :copyright: (c) 2013-2015 by Openlabs Technologies & Consulting (P) Limited
     :license: GPLv3, see LICENSE for more details.
 '''
 from trytond.model import fields
@@ -130,7 +130,8 @@ class Product:
             'products': [('create', [{
                 'ebay_item_id': product_data['Item']['ItemID']['value'],
                 'description': product_data['Item']['Description']['value'],
-                'code': product_data['Item'].get('SKU', None) and
+                'code':
+                    product_data['Item'].get('SKU', None) and
                     product_data['Item']['SKU']['value'],
             }])],
         })
