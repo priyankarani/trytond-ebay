@@ -1,11 +1,69 @@
 #!/usr/bin/env python
-#This file is part of Tryton.  The COPYRIGHT file at the top level of
-#this repository contains the full copyright notices and license terms.
-
-from setuptools import setup
+# This file is part of Tryton.  The COPYRIGHT file at the top level of
+# this repository contains the full copyright notices and license terms.
+from setuptools import setup, Command
+import unittest
+import sys
+import time
 import re
 import os
 import ConfigParser
+
+
+class SQLiteTest(Command):
+    """
+    Run the tests on SQLite
+    """
+    description = "Run tests on SQLite"
+
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        os.environ['TRYTOND_DATABASE_URI'] = 'sqlite://'
+        os.environ['DB_NAME'] = ':memory:'
+
+        from tests import suite
+        test_result = unittest.TextTestRunner(verbosity=3).run(suite())
+
+        if test_result.wasSuccessful():
+            sys.exit(0)
+        sys.exit(-1)
+
+
+class PostgresTest(Command):
+    """
+    Run the tests on Postgres.
+    """
+    description = "Run tests on Postgresql"
+
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        if self.distribution.tests_require:
+            self.distribution.fetch_build_eggs(self.distribution.tests_require)
+
+        os.environ['TRYTOND_DATABASE_URI'] = 'postgresql://'
+
+        os.environ['DB_NAME'] = 'test_' + str(int(time.time()))
+
+        from tests import suite
+        test_result = unittest.TextTestRunner(verbosity=3).run(suite())
+
+        if test_result.wasSuccessful():
+            sys.exit(0)
+        sys.exit(-1)
 
 
 def read(fname):
@@ -24,32 +82,37 @@ minor_version = int(minor_version)
 requires = [
     'ebaysdk',
 ]
+MODULE2PREFIX = {}
+MODULE = "ebay"
+PREFIX = "trytond"
 for dep in info.get('depends', []):
     if not re.match(r'(ir|res|webdav)(\W|$)', dep):
-        requires.append('trytond_%s >= %s.%s, < %s.%s' % (
-            dep, major_version, minor_version, major_version, minor_version + 1
-        ))
-requires.append('trytond >= %s.%s, < %s.%s' % (
-    major_version, minor_version, major_version, minor_version + 1
-))
+        requires.append(
+            '%s_%s >= %s.%s, < %s.%s' % (
+                MODULE2PREFIX.get(dep, 'trytond'), dep,
+                major_version, minor_version, major_version,
+                minor_version + 1
+            )
+        )
 
 setup(
-    name='trytond_ebay',
+    name='%s_%s' % (PREFIX, MODULE),
     version=info.get('version', '0.0.1'),
     description='eBay Integration',
     long_description=read('README.md'),
     author='Openlabs Technologies and Consulting P Ltd.',
     url='http://openlabs.co.in/',
     download_url="https://github.com/openlabs/trytond-ebay",
-    package_dir={'trytond.modules.ebay': '.'},
+    package_dir={'trytond.modules.%s' % MODULE: '.'},
     packages=[
-        'trytond.modules.ebay',
-        'trytond.modules.ebay.tests',
+        'trytond.modules.%s' % MODULE,
+        'trytond.modules.%s.tests' % MODULE,
     ],
     package_data={
-        'trytond.modules.ebay': info.get('xml', []) + [
-            'tryton.cfg', 'view/*.xml'
-        ],
+        'trytond.modules.%s' % MODULE:
+            info.get('xml', []) + [
+                'tryton.cfg', 'view/*xml'
+            ],
     },
     classifiers=[
         'Development Status :: 4 - Beta',
@@ -62,7 +125,6 @@ setup(
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Natural Language :: English',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Topic :: Office/Business',
     ],
@@ -72,8 +134,12 @@ setup(
     zip_safe=False,
     entry_points="""
     [trytond.modules]
-    ebay = trytond.modules.ebay
-    """,
+    %s = trytond.modules.%s
+    """ % (MODULE, MODULE),
     test_suite='tests',
     test_loader='trytond.test_loader:Loader',
+    cmdclass={
+        'test': SQLiteTest,
+        'test_on_postgres': PostgresTest,
+    },
 )

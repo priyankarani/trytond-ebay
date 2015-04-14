@@ -2,7 +2,7 @@
 '''
     product
 
-    :copyright: (c) 2013 by Openlabs Technologies & Consulting (P) Limited
+    :copyright: (c) 2013-2015 by Openlabs Technologies & Consulting (P) Limited
     :license: GPLv3, see LICENSE for more details.
 '''
 from trytond.model import fields
@@ -36,22 +36,16 @@ class Product:
         """
         super(Product, cls).__setup__()
         cls._error_messages.update({
-            "invalid_product": 'Product with eBay Item ID "%s" already exists',
             "missing_product_code": 'Product "%s" has a missing code.',
         })
 
-    @classmethod
-    def validate(cls, products):
-        super(Product, cls).validate(products)
-        for product in products:
-            product.check_ebay_item_id()
-
-    def check_ebay_item_id(self):
-        "Check the eBay Item ID for duplicates"
-        if self.ebay_item_id and len(
-            self.search([('ebay_item_id', '=', self.ebay_item_id)])
-        ) > 1:
-            self.raise_user_error('invalid_product', (self.ebay_item_id,))
+        cls._sql_constraints += [
+            (
+                'unique_product_ebay_item_id',
+                'UNIQUE(ebay_item_id)',
+                'eBay Item ID must be unique for each product'
+            )
+        ]
 
     @classmethod
     def find_or_create_using_ebay_id(cls, ebay_id):
@@ -130,7 +124,8 @@ class Product:
             'products': [('create', [{
                 'ebay_item_id': product_data['Item']['ItemID']['value'],
                 'description': product_data['Item']['Description']['value'],
-                'code': product_data['Item'].get('SKU', None) and
+                'code':
+                    product_data['Item'].get('SKU', None) and
                     product_data['Item']['SKU']['value'],
             }])],
         })
