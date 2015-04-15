@@ -4,7 +4,7 @@
 
     Sale
 
-    :copyright: (c) 2013 by Openlabs Technologies & Consulting (P) Limited
+    :copyright: (c) 2013-2015 by Openlabs Technologies & Consulting (P) Limited
     :license: GPLv3, see LICENSE for more details.
 """
 import dateutil.parser
@@ -103,7 +103,6 @@ class Sale:
         :return: Active record of record created
         """
         Party = Pool().get('party.party')
-        Address = Pool().get('party.address')
         SellerAccount = Pool().get('ebay.seller.account')
         Currency = Pool().get('currency.currency')
         Uom = Pool().get('product.uom')
@@ -140,9 +139,13 @@ class Sale:
             order_data['BuyerUserID']['value'], item_id=item_id
         )
 
+        party.add_phone_using_ebay_data(
+            order_data['ShippingAddress']['Phone']['value']
+        )
+
         party_invoice_address = party_shipping_address = \
-            Address.find_or_create_for_party_using_ebay_data(
-                party, order_data['ShippingAddress']
+            party.find_or_create_address_using_ebay_data(
+                order_data['ShippingAddress']
             )
         unit, = Uom.search([('name', '=', 'Unit')])
 
@@ -236,7 +239,7 @@ class Sale:
                 ) and order_data[
                     'ShippingServiceSelected'
                 ]['ShippingServiceCost']['value']
-                ),
+            ),
             'unit': unit.id,
             'note': order_data['ShippingServiceSelected'].get(
                 'ShippingService', None

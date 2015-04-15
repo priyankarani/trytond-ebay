@@ -213,6 +213,13 @@ class TestBase(unittest.TestCase):
             'type': 'state',
         }])
 
+        self.Subdivision.create([{
+            'name': 'New Delhi',
+            'code': 'IN-DL',
+            'type': 'state',
+            'country': self.country_in.id,
+        }])
+
         model_field, = self.ModelField.search([
             ('name', '=', 'account_revenue'),
             ('model.model', '=', 'product.template'),

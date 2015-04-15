@@ -112,7 +112,8 @@ class SellerAccount(ModelSQL, ModelView):
             )
         ]
         cls._error_messages.update({
-            "no_orders": 'No new orders have been placed on eBay for this ' +
+            "no_orders":
+                'No new orders have been placed on eBay for this '
                 'seller account after %s'
         })
         cls._buttons.update({
@@ -273,7 +274,8 @@ class ImportOrders(Wizard):
         Sets default data for wizard
         """
         return {
-            'message': 'This wizard will import orders for this seller ' +
+            'message':
+                'This wizard will import orders for this seller ' +
                 'account. It imports orders updated after Last Order ' +
                 'Import Time.'
         }
