@@ -2,14 +2,15 @@
 """
     test_base
 
-    :copyright: (c) 2013 by Openlabs Technologies & Consulting (P) Limited
+    :copyright: (c) 2013-2015 by Openlabs Technologies & Consulting (P) Limited
     :license: GPLv3, see LICENSE for more details.
 """
 import os
 import json
+import unittest
+from decimal import Decimal
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-import unittest
 
 import trytond.tests.test_tryton
 from trytond.tests.test_tryton import POOL, USER
@@ -81,7 +82,9 @@ class TestBase(unittest.TestCase):
         self.AccountConfiguration = POOL.get('account.configuration')
         self.Property = POOL.get('ir.property')
         self.ModelField = POOL.get('ir.model.field')
-        self.SellerAccount = POOL.get('ebay.seller.account')
+        self.SaleChannel = POOL.get('sale.channel')
+        self.Location = POOL.get('stock.location')
+        self.PriceList = POOL.get('product.price_list')
 
         with Transaction().set_context(company=None):
             self.party, = self.Party.create([{
@@ -177,7 +180,7 @@ class TestBase(unittest.TestCase):
         )
 
         # Create payment term
-        self.PaymentTerm.create([{
+        self.payment_term, = self.PaymentTerm.create([{
             'name': 'Direct',
             'lines': [('create', [{'type': 'remainder'}])]
         }])
@@ -228,10 +231,22 @@ class TestBase(unittest.TestCase):
         self.uom, = self.Uom.search([
             ('name', '=', 'Unit'),
         ])
+        warehouse, = self.Location.search([
+            ('type', '=', 'warehouse')
+        ], limit=1)
 
-        self.ebay_seller_account, = self.SellerAccount.create([{
-            'name': 'My seller account',
+        self.price_list = self._create_pricelist()
+
+        self.ebay_channel, = self.SaleChannel.create([{
+            'name': 'eBay Account',
+            'warehouse': warehouse.id,
             'company': self.company.id,
+            'source': 'ebay',
+            'currency': self.company.currency.id,
+            'price_list': self.price_list,
+            'invoice_method': 'manual',
+            'shipment_method': 'manual',
+            'payment_term': self.payment_term,
             'app_id': 'test_app_id_by_ebay',
             'dev_id': 'test_dev_id_by_ebay',
             'cert_id': 'test_cert_id_by_ebay',
@@ -246,10 +261,24 @@ class TestBase(unittest.TestCase):
         self.Property.create([{
             'value':
                 'account.account' + ',' +
-                str(self.ebay_seller_account.default_account_revenue.id),
+                str(self.ebay_channel.default_account_revenue.id),
             'res': None,
             'field': model_field.id,
         }])
+
+    def _create_pricelist(self):
+        """
+        Create the pricelists
+        """
+        return self.PriceList.create([{
+            'name': 'PL 1',
+            'company': self.company.id,
+            'lines': [
+                ('create', [{
+                    'formula': 'unit_price * %s' % Decimal('1.10')
+                }])
+            ],
+        }])[0]
 
     def get_account_by_kind(self, kind, company=None, silent=True):
         """Returns an account with given spec

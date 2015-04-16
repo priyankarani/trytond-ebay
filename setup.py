@@ -82,7 +82,9 @@ minor_version = int(minor_version)
 requires = [
     'ebaysdk',
 ]
-MODULE2PREFIX = {}
+MODULE2PREFIX = {
+    'sale_channel': 'openlabs'
+}
 MODULE = "ebay"
 PREFIX = "trytond"
 for dep in info.get('depends', []):

@@ -61,7 +61,7 @@ class Party:
             informations like eMail etc.
         :return: Active record of record created/found
         """
-        SellerAccount = Pool().get('ebay.seller.account')
+        SaleChannel = Pool().get('sale.channel')
 
         ebay_parties = cls.search([
             ('ebay_user_id', '=', ebay_user_id),
@@ -70,11 +70,10 @@ class Party:
         if ebay_parties:
             return ebay_parties[0]
 
-        seller_account = SellerAccount(
-            Transaction().context.get('ebay_seller_account')
-        )
+        ebay_channel = SaleChannel(Transaction().context['current_channel'])
+        ebay_channel.validate_ebay_channel()
 
-        api = seller_account.get_trading_api()
+        api = ebay_channel.get_trading_api()
 
         filters = {'UserID': ebay_user_id}
         if item_id:

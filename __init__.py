@@ -12,9 +12,9 @@ from .country import Subdivision
 from .party import Party, Address
 from .product import Product
 from .sale import Sale
-from .ebay import (
-    SellerAccount, CheckTokenStatusView, CheckTokenStatus,
-    ImportOrders, ImportOrdersView
+from channel import (
+    SaleChannel, CheckEbayTokenStatusView, CheckEbayTokenStatus,
+    ImportEbayOrders, ImportEbayOrdersView
 )
 
 
@@ -24,15 +24,15 @@ def register():
         Subdivision,
         Party,
         Address,
-        SellerAccount,
+        SaleChannel,
         Product,
         Sale,
-        CheckTokenStatusView,
-        ImportOrdersView,
+        CheckEbayTokenStatusView,
+        ImportEbayOrdersView,
         module='ebay', type_='model'
     )
     Pool.register(
-        CheckTokenStatus,
-        ImportOrders,
+        CheckEbayTokenStatus,
+        ImportEbayOrders,
         module='ebay', type_='wizard'
     )

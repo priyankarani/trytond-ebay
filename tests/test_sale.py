@@ -4,7 +4,7 @@
 
     Tests sale
 
-    :copyright: (c) 2013 by Openlabs Technologies & Consulting (P) Limited
+    :copyright: (c) 2013-2015 by Openlabs Technologies & Consulting (P) Limited
     :license: GPLv3, see LICENSE for more details.
 """
 import os
@@ -42,7 +42,8 @@ class TestSale(TestBase):
             self.setup_defaults()
 
             with Transaction().set_context({
-                'ebay_seller_account': self.ebay_seller_account.id,
+                'current_channel': self.ebay_channel.id,
+                'company': self.company
             }):
 
                 orders = Sale.search([])
@@ -60,8 +61,7 @@ class TestSale(TestBase):
                     load_json('products', '110122281466')
                 )
 
-                with Transaction().set_context(company=self.company):
-                    order = Sale.create_using_ebay_data(order_data)
+                order = Sale.create_using_ebay_data(order_data)
 
                 self.assertEqual(order.state, 'confirmed')
 

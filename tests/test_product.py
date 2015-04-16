@@ -3,7 +3,7 @@
 
     Tests party
 
-    :copyright: (c) 2013 by Openlabs Technologies & Consulting (P) Limited
+    :copyright: (c) 2013-2015 by Openlabs Technologies & Consulting (P) Limited
     :license: GPLv3, see LICENSE for more details.
 """
 import os
@@ -40,7 +40,7 @@ class TestProduct(TestBase):
             self.setup_defaults()
 
             with txn.set_context({
-                'ebay_seller_account': self.ebay_seller_account.id,
+                'current_channel': self.ebay_channel.id,
                 'company': self.company,
             }):
 
@@ -75,7 +75,7 @@ class TestProduct(TestBase):
             self.setup_defaults()
 
             with txn.set_context({
-                'ebay_seller_account': self.ebay_seller_account.id,
+                'current_channel': self.ebay_channel.id,
                 'company': self.company,
             }):
 
