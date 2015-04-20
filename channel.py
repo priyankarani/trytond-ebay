@@ -33,60 +33,39 @@ class SaleChannel:
     "Sale Channel"
     __name__ = 'sale.channel'
 
-    app_id = fields.Char(
-        'AppID', states=EBAY_STATES, depends=['source'],
+    ebay_app_id = fields.Char(
+        'eBay AppID', states=EBAY_STATES, depends=['source'],
         help="APP ID of the account - provided by eBay",
     )
 
-    dev_id = fields.Char(
-        'DevID', help="Dev ID of account - provided by eBay",
+    ebay_dev_id = fields.Char(
+        'eBay DevID', help="Dev ID of account - provided by eBay",
         states=EBAY_STATES, depends=['source']
     )
 
-    cert_id = fields.Char(
-        'CertID', help="Cert ID of account - provided by eBay",
+    ebay_cert_id = fields.Char(
+        'eBay CertID', help="Cert ID of account - provided by eBay",
         states=EBAY_STATES, depends=['source']
     )
 
-    token = fields.Text(
-        'Token', states=EBAY_STATES, depends=['source'],
+    ebay_token = fields.Text(
+        'eBay Token', states=EBAY_STATES, depends=['source'],
         help="Token for this user account - to be generated from eBay "
         "developer home. If it expirees, then a new one should be generated",
     )
 
-    is_sandbox = fields.Boolean(
-        'Is sandbox ?',
+    is_ebay_sandbox = fields.Boolean(
+        'Is eBay sandbox ?',
         help="Select this if this account is a sandbox account",
         states=EBAY_STATES, depends=['source']
     )
 
-    # TODO: These fields should either move to channel module or should be
-    # renanmed
-    default_uom = fields.Many2One(
-        'product.uom', 'Default Product UOM', states=EBAY_STATES,
-        depends=['source']
-    )
-
-    default_account_expense = fields.Property(fields.Many2One(
-        'account.account', 'Account Expense', domain=[
-            ('kind', '=', 'expense'),
-            ('company', '=', Eval('company')),
-        ], states=EBAY_STATES, depends=['source', 'company']
-    ))
-
-    default_account_revenue = fields.Property(fields.Many2One(
-        'account.account', 'Account Revenue', domain=[
-            ('kind', '=', 'revenue'),
-            ('company', '=', Eval('company')),
-        ], states=EBAY_STATES, depends=['source', 'company']
-    ))
-
-    last_order_import_time = fields.DateTime(
-        'Last Order Import Time', states=EBAY_STATES, depends=['source']
+    last_ebay_order_import_time = fields.DateTime(
+        'Last eBay Order Import Time', states=EBAY_STATES, depends=['source']
     )
 
     @staticmethod
-    def default_last_order_import_time():
+    def default_last_ebay_order_import_time():
         """
         Set default last order import time
         """
@@ -103,15 +82,6 @@ class SaleChannel:
 
         return sources
 
-    @staticmethod
-    def default_default_uom():
-        UoM = Pool().get('product.uom')
-
-        unit = UoM.search([
-            ('name', '=', 'Unit'),
-        ])
-        return unit and unit[0].id or None
-
     @classmethod
     def __setup__(cls):
         """
@@ -121,7 +91,7 @@ class SaleChannel:
         cls._sql_constraints += [
             (
                 'unique_app_dev_cert_token',
-                'UNIQUE(app_id, dev_id, cert_id, token)',
+                'UNIQUE(ebay_app_id, ebay_dev_id, ebay_cert_id, ebay_token)',
                 'All the ebay credentials should be unique.'
             )
         ]
@@ -136,17 +106,17 @@ class SaleChannel:
             'import_ebay_orders_button': {},
         })
 
-    def get_trading_api(self):
+    def get_ebay_trading_api(self):
         """Create an instance of ebay trading api
 
         :return: ebay trading api instance
         """
-        domain = 'api.sandbox.ebay.com' if self.is_sandbox else 'api.ebay.com'
+        domain = 'api.sandbox.ebay.com' if self.is_ebay_sandbox else 'api.ebay.com'
         return trading(
-            appid=self.app_id,
-            certid=self.cert_id,
-            devid=self.dev_id,
-            token=self.token,
+            appid=self.ebay_app_id,
+            certid=self.ebay_cert_id,
+            devid=self.ebay_dev_id,
+            token=self.ebay_token,
             domain=domain
         )
 
@@ -183,13 +153,13 @@ class SaleChannel:
         self.validate_ebay_channel()
 
         sales = []
-        api = self.get_trading_api()
+        api = self.get_ebay_trading_api()
         now = datetime.utcnow()
 
-        last_import_time = self.last_order_import_time
+        last_import_time = self.last_ebay_order_import_time
 
         # Update current time for order update
-        self.write([self], {'last_order_import_time': now})
+        self.write([self], {'last_ebay_order_import_time': now})
 
         response = api.execute(
             'GetOrders', {
@@ -251,7 +221,7 @@ class CheckEbayTokenStatus(Wizard):
 
         ebay_channel = SaleChannel(Transaction().context.get('active_id'))
 
-        api = ebay_channel.get_trading_api()
+        api = ebay_channel.get_ebay_trading_api()
         response = api.execute('GetTokenStatus').response_dict()
 
         return {

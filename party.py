@@ -73,7 +73,7 @@ class Party:
         ebay_channel = SaleChannel(Transaction().context['current_channel'])
         ebay_channel.validate_ebay_channel()
 
-        api = ebay_channel.get_trading_api()
+        api = ebay_channel.get_ebay_trading_api()
 
         filters = {'UserID': ebay_user_id}
         if item_id:
