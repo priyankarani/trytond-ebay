@@ -78,7 +78,7 @@ class Party:
         filters = {'UserID': ebay_user_id}
         if item_id:
             filters['ItemID'] = item_id
-        user_data = api.execute('GetUser', filters).response_dict()
+        user_data = api.execute('GetUser', filters).dict()
 
         return cls.create_using_ebay_data(user_data)
 

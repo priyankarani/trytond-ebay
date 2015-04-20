@@ -72,7 +72,7 @@ class Product:
 
         product_data = api.execute(
             'GetItem', {'ItemID': ebay_id, 'DetailLevel': 'ReturnAll'}
-        ).response_dict()
+        ).dict()
 
         return cls.create_using_ebay_data(product_data)
 

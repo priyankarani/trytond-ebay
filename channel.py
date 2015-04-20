@@ -9,7 +9,7 @@ import dateutil.parser
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
-from ebaysdk import trading
+from ebaysdk.trading import Connection as trading
 from trytond.transaction import Transaction
 from trytond.wizard import Wizard, StateView, Button, StateAction
 from trytond.model import ModelView, fields
@@ -166,7 +166,7 @@ class SaleChannel:
                 'CreateTimeFrom': last_import_time,
                 'CreateTimeTo': now
             }
-        ).response_dict()
+        ).dict()
         if not response.get('OrderArray'):
             self.raise_user_error(
                 'no_orders', (last_import_time, )
@@ -222,12 +222,12 @@ class CheckEbayTokenStatus(Wizard):
         ebay_channel = SaleChannel(Transaction().context.get('active_id'))
 
         api = ebay_channel.get_ebay_trading_api()
-        response = api.execute('GetTokenStatus').response_dict()
+        response = api.execute('GetTokenStatus').dict()
 
         return {
-            'status': response['TokenStatus']['Status']['value'],
+            'status': response['TokenStatus']['Status'],
             'expiry_date': dateutil.parser.parse(
-                response['TokenStatus']['ExpirationTime']['value']
+                response['TokenStatus']['ExpirationTime']
             ),
         }
 

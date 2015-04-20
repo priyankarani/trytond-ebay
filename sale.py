@@ -86,7 +86,7 @@ class Sale:
                     'OrderID': order_id
                 }, 'DetailLevel': 'ReturnAll'
             }
-        ).response_dict()
+        ).dict()
 
         return cls.create_using_ebay_data(order_data['OrderArray']['Order'])
 
