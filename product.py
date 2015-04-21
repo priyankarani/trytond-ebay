@@ -57,7 +57,7 @@ class Product:
         :param ebay_id: Product ID from eBay
         :returns: Active record of Product Created
         """
-        SellerAccount = Pool().get('ebay.seller.account')
+        SaleChannel = Pool().get('sale.channel')
 
         products = cls.search([('ebay_item_id', '=', ebay_id)])
 
@@ -66,14 +66,13 @@ class Product:
 
         # if product is not found get the info from ebay and
         # delegate to create_using_ebay_data
-        seller_account = SellerAccount(
-            Transaction().context.get('ebay_seller_account')
-        )
-        api = seller_account.get_trading_api()
+        ebay_channel = SaleChannel(Transaction().context['current_channel'])
+        ebay_channel.validate_ebay_channel()
+        api = ebay_channel.get_ebay_trading_api()
 
         product_data = api.execute(
             'GetItem', {'ItemID': ebay_id, 'DetailLevel': 'ReturnAll'}
-        ).response_dict()
+        ).dict()
 
         return cls.create_using_ebay_data(product_data)
 
@@ -87,11 +86,10 @@ class Product:
         :param: product_data
         :returns: Dictionary of values
         """
-        SellerAccount = Pool().get('ebay.seller.account')
+        SaleChannel = Pool().get('sale.channel')
 
-        account = SellerAccount(
-            Transaction().context.get('ebay_seller_account')
-        )
+        ebay_channel = SaleChannel(Transaction().context['current_channel'])
+        ebay_channel.validate_ebay_channel()
         return {
             'name': product_data['Item']['Title']['value'],
             'list_price': Decimal(
@@ -99,11 +97,11 @@ class Product:
                 product_data['Item']['StartPrice']['value']
             ),
             'cost_price': Decimal(product_data['Item']['StartPrice']['value']),
-            'default_uom': account.default_uom.id,
+            'default_uom': ebay_channel.default_uom.id,
             'salable': True,
-            'sale_uom': account.default_uom.id,
-            'account_expense': account.default_account_expense.id,
-            'account_revenue': account.default_account_revenue.id,
+            'sale_uom': ebay_channel.default_uom.id,
+            'account_expense': ebay_channel.default_account_expense.id,
+            'account_revenue': ebay_channel.default_account_revenue.id,
         }
 
     @classmethod

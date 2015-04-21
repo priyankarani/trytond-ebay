@@ -4,7 +4,7 @@
 
     Sale
 
-    :copyright: (c) 2013 by Openlabs Technologies & Consulting (P) Limited
+    :copyright: (c) 2013-2015 by Openlabs Technologies & Consulting (P) Limited
     :license: GPLv3, see LICENSE for more details.
 """
 import dateutil.parser
@@ -15,9 +15,8 @@ from trytond.transaction import Transaction
 from trytond.pool import PoolMeta, Pool
 
 
-__all__ = [
-    'Sale',
-]
+__all__ = ['Sale']
+
 __metaclass__ = PoolMeta
 
 
@@ -31,7 +30,6 @@ class Sale:
         " Warning: Editing this might result in duplicate orders on next"
         " import"
     )
-    ebay_seller = fields.Many2One('ebay.seller.account', 'eBay Seller')
 
     @classmethod
     def __setup__(cls):
@@ -69,7 +67,7 @@ class Sale:
         :type order_id: string
         :returns: Active record of sale order created/found
         """
-        SellerAccount = Pool().get('ebay.seller.account')
+        SaleChannel = Pool().get('sale.channel')
 
         sales = cls.search([
             ('ebay_order_id', '=', order_id),
@@ -77,10 +75,10 @@ class Sale:
         if sales:
             return sales[0]
 
-        seller_account = SellerAccount(
-            Transaction().context.get('ebay_seller_account')
-        )
-        api = seller_account.get_trading_api()
+        ebay_channel = SaleChannel(Transaction().context['current_channel'])
+        ebay_channel.validate_ebay_channel()
+
+        api = ebay_channel.get_ebay_trading_api()
 
         order_data = api.execute(
             'GetOrders', {
@@ -88,7 +86,7 @@ class Sale:
                     'OrderID': order_id
                 }, 'DetailLevel': 'ReturnAll'
             }
-        ).response_dict()
+        ).dict()
 
         return cls.create_using_ebay_data(order_data['OrderArray']['Order'])
 
@@ -103,14 +101,13 @@ class Sale:
         :return: Active record of record created
         """
         Party = Pool().get('party.party')
-        Address = Pool().get('party.address')
-        SellerAccount = Pool().get('ebay.seller.account')
         Currency = Pool().get('currency.currency')
+        SaleChannel = Pool().get('sale.channel')
         Uom = Pool().get('product.uom')
 
-        seller_account = SellerAccount(
-            Transaction().context.get('ebay_seller_account')
-        )
+        ebay_channel = SaleChannel(Transaction().context['current_channel'])
+
+        ebay_channel.validate_ebay_channel()
 
         currency, = Currency.search([
             ('code', '=', order_data['Total']['currencyID']['value'])
@@ -140,9 +137,13 @@ class Sale:
             order_data['BuyerUserID']['value'], item_id=item_id
         )
 
+        party.add_phone_using_ebay_data(
+            order_data['ShippingAddress']['Phone']['value']
+        )
+
         party_invoice_address = party_shipping_address = \
-            Address.find_or_create_for_party_using_ebay_data(
-                party, order_data['ShippingAddress']
+            party.find_or_create_address_using_ebay_data(
+                order_data['ShippingAddress']
             )
         unit, = Uom.search([('name', '=', 'Unit')])
 
@@ -157,7 +158,7 @@ class Sale:
             'shipment_address': party_shipping_address.id,
             'ebay_order_id': order_data['OrderID']['value'],
             'lines': cls.get_item_line_data_using_ebay_data(order_data),
-            'ebay_seller': seller_account.id,
+            'channel': ebay_channel.id,
         }
 
         sale_data['lines'].append(
@@ -236,7 +237,7 @@ class Sale:
                 ) and order_data[
                     'ShippingServiceSelected'
                 ]['ShippingServiceCost']['value']
-                ),
+            ),
             'unit': unit.id,
             'note': order_data['ShippingServiceSelected'].get(
                 'ShippingService', None
