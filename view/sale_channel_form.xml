@@ -8,7 +8,7 @@
             <label name="ebay_dev_id" />
             <field name="ebay_dev_id" />
             <label name="ebay_cert_id" />
-            <field name="ebay_cert_id" />
+            <field name="ebay_cert_id" widget="password" />
             <label name="is_ebay_sandbox" />
             <field name="is_ebay_sandbox" />
             <newline/>
