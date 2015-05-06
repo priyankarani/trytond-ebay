@@ -80,7 +80,7 @@ major_version = int(major_version)
 minor_version = int(minor_version)
 
 requires = [
-    'ebaysdk',
+    'ebaysdk>=2.1',
 ]
 MODULE2PREFIX = {
     'sale_channel': 'openlabs'
