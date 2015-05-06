@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<form string="Check Token Status">
+    <label name="status"/>
+    <field name="status"/>
+    <label name="expiry_date"/>
+    <field name="expiry_date"/>
+</form>

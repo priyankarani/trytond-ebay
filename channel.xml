@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<tryton>
+  <data>
+
+        <record model="ir.ui.view" id="sale_channel_view_form">
+            <field name="model">sale.channel</field>
+            <field name="inherit" ref="sale_channel.sale_channel_view_form"/>
+            <field name="name">sale_channel_form</field>
+        </record>
+
+        <!--Check eBay Token Status Wizard-->
+        <record model="ir.action.wizard" id="wizard_check_ebay_token_status">
+            <field name="name">Check eBay Token Status</field>
+            <field name="wiz_name">channel.ebay.check_token_status</field>
+            <field name="model">sale.channel</field>
+        </record>
+
+        <record model="ir.ui.view" id="check_ebay_token_status_view_form">
+            <field name="model">channel.ebay.check_token_status.view</field>
+            <field name="type">form</field>
+            <field name="name">wizard_check_ebay_token_status_view_form</field>
+        </record>
+
+        <!--Import ebay orders wizard-->
+        <record model="ir.action.wizard" id="wizard_import_ebay_orders">
+            <field name="name">Import eBay Orders</field>
+            <field name="wiz_name">channel.ebay.import_orders</field>
+            <field name="model">sale.channel</field>
+        </record>
+
+        <record model="ir.ui.view" id="import_ebay_orders_view_form">
+            <field name="model">channel.ebay.import_orders.view</field>
+            <field name="type">form</field>
+            <field name="name">wizard_import_ebay_orders_view_form</field>
+        </record>
+
+        <!--Cron To Import Orders-->
+        <record model="ir.cron" id="cron_import_ebay_orders">
+            <field name="name">Import eBay Orders</field>
+            <field name="request_user" ref="res.user_admin"/>
+            <field name="user" ref="res.user_trigger"/>
+            <field name="active" eval="True"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="number_calls">-1</field>
+            <field name="repeat_missed" eval="False"/>
+            <field name="model">sale.channel</field>
+            <field name="function">import_ebay_orders_using_cron</field>
+        </record>
+
+    </data>
+</tryton>

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<data>
+    <xpath expr="//notebook" position="inside">
+      <page id="ebay_details" string="eBay"
+                states="{'invisible': Not(Eval('source') == 'ebay')}">
+            <label name="ebay_app_id" />
+            <field name="ebay_app_id" />
+            <label name="ebay_dev_id" />
+            <field name="ebay_dev_id" />
+            <label name="ebay_cert_id" />
+            <field name="ebay_cert_id" widget="password" />
+            <label name="is_ebay_sandbox" />
+            <field name="is_ebay_sandbox" />
+            <newline/>
+            <label name="ebay_token" />
+            <field name="ebay_token" colspan="3" />
+
+            <separator id="last_import_export_time" string="Import / Export Time" colspan="2"/>
+            <newline/>
+            <label name="last_ebay_order_import_time"/>
+            <field name="last_ebay_order_import_time"/>
+            <newline/>
+            <group id="ebay_buttons" col="2" colspan="4"
+                    states="{'invisible': Not(Eval('source') == 'ebay')}">
+                <button string="Check eBay Token Status" name="check_ebay_token_status"/>
+                <button string="Import eBay Orders" name="import_ebay_orders_button"/>
+            </group>
+        </page>
+    </xpath>
+</data>
