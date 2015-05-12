@@ -57,7 +57,9 @@ class SaleChannel:
     is_ebay_sandbox = fields.Boolean(
         'Is eBay sandbox ?',
         help="Select this if this account is a sandbox account",
-        states=EBAY_STATES, depends=['source']
+        states={
+            'invisible': ~(Eval('source') == 'ebay')
+        }, depends=['source']
     )
 
     last_ebay_order_import_time = fields.DateTime(
@@ -88,30 +90,54 @@ class SaleChannel:
         Setup the class before adding to pool
         """
         super(SaleChannel, cls).__setup__()
-        cls._sql_constraints += [
-            (
-                'unique_app_dev_cert_token',
-                'UNIQUE(ebay_app_id, ebay_dev_id, ebay_cert_id, ebay_token)',
-                'All the ebay credentials should be unique.'
-            )
-        ]
         cls._error_messages.update({
             "no_orders":
                 'No new orders have been placed on eBay for this '
                 'Channel after %s',
-            "invalid_channel": "Current channel does not belong to eBay!"
+            "invalid_channel": "Current channel does not belong to eBay!",
+            'same_ebay_credentials':
+                'All the ebay credentials should be unique.'
         })
         cls._buttons.update({
             'check_ebay_token_status': {},
             'import_ebay_orders_button': {},
         })
 
+    @classmethod
+    def validate(cls, channels):
+        """
+        Validate sale channel
+        """
+        super(SaleChannel, cls).validate(channels)
+
+        for channel in channels:
+            channel.check_unique_app_dev_cert_token()
+
+    def check_unique_app_dev_cert_token(self):
+        """
+        App ID, Dev ID, Cert ID and Token must be unique
+        """
+        if not all([
+            self.ebay_app_id, self.ebay_dev_id,
+            self.ebay_cert_id, self.ebay_token
+        ]):
+            return
+        if self.search([
+            ('ebay_app_id', '=', self.ebay_app_id),
+            ('ebay_dev_id', '=', self.ebay_dev_id),
+            ('ebay_cert_id', '=', self.ebay_cert_id),
+            ('ebay_token', '=', self.ebay_token),
+            ('id', '!=', self.id)
+        ]):
+            self.raise_user_error("same_ebay_credentials")
+
     def get_ebay_trading_api(self):
         """Create an instance of ebay trading api
 
         :return: ebay trading api instance
         """
-        domain = 'api.sandbox.ebay.com' if self.is_ebay_sandbox else 'api.ebay.com'
+        domain = 'api.sandbox.ebay.com' if \
+            self.is_ebay_sandbox else 'api.ebay.com'
         return trading(
             appid=self.ebay_app_id,
             certid=self.ebay_cert_id,
