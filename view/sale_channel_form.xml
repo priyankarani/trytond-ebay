@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <data>
-    <xpath expr="//notebook" position="inside">
-      <page id="ebay_details" string="eBay"
-                states="{'invisible': Not(Eval('source') == 'ebay')}">
+    <xpath expr="/form/notebook/page[@id='configuration']/notebook/page[@id='connection']" position="inside">
+        <group id="ebay_connection_settings" col="4" colspan="4" states="{'invisible': Not(Eval('source') == 'ebay')}"> 
             <label name="ebay_app_id" />
             <field name="ebay_app_id" />
             <label name="ebay_dev_id" />
@@ -14,16 +13,16 @@
             <newline/>
             <label name="ebay_token" />
             <field name="ebay_token" colspan="3" />
-
-            <separator id="last_import_export_time" string="Import / Export Time" colspan="2"/>
+        </group>
+    </xpath>
+    <xpath expr="/form/notebook/page[@id='configuration']/notebook/page[@id='import_export']/group[@id='channel_common_buttons']" position="before" >
+        <group id="ebay_order" states="{'invisible': Not(Eval('source') == 'ebay')}" >
             <newline/>
+            <button string="Check eBay Token Status" name="check_ebay_token_status"/>
+            <button string="Import eBay Orders" name="import_ebay_orders_button"/>
             <label name="last_ebay_order_import_time"/>
             <field name="last_ebay_order_import_time"/>
             <newline/>
-            <group id="ebay_buttons" col="2" colspan="4"
-                    states="{'invisible': Not(Eval('source') == 'ebay')}">
-                <button string="Check eBay Token Status" name="check_ebay_token_status"/>
-            </group>
-        </page>
+        </group>
     </xpath>
 </data>
