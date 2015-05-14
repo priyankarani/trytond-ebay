@@ -113,7 +113,7 @@ setup(
     package_data={
         'trytond.modules.%s' % MODULE:
             info.get('xml', []) + [
-                'tryton.cfg', 'view/*xml'
+                'tryton.cfg', 'view/*xml', 'ebay.yaml'
             ],
     },
     classifiers=[
