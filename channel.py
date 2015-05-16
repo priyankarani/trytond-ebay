@@ -143,7 +143,8 @@ class SaleChannel:
             certid=self.ebay_cert_id,
             devid=self.ebay_dev_id,
             token=self.ebay_token,
-            domain=domain
+            domain=domain,
+            config_file=None,
         )
 
     @classmethod
