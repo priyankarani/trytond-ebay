@@ -104,6 +104,7 @@ class Sale:
         Currency = Pool().get('currency.currency')
         SaleChannel = Pool().get('sale.channel')
         Uom = Pool().get('product.uom')
+        ChannelException = Pool().get('channel.exception')
 
         ebay_channel = SaleChannel(Transaction().context['current_channel'])
 
@@ -170,8 +171,15 @@ class Sale:
 
         sale, = cls.create([sale_data])
 
-        # Assert that the order totals are same
-        assert sale.total_amount == Decimal(order_data['Total']['value'])
+        # Create channel exception if order total does not match
+        if sale.total_amount != Decimal(order_data['Total']['value']):
+            ChannelException.create([{
+                'origin': '%s,%s' % (sale.__name__, sale.id),
+                'log': 'Order total does not match.',
+                'channel': sale.channel.id,
+            }])
+
+            return sale
 
         # We import only completed orders, so we can confirm them all
         cls.quote([sale])
