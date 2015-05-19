@@ -71,6 +71,59 @@ class TestSale(TestBase):
                 # Item lines + shipping line should be equal to lines on tryton
                 self.assertEqual(len(order.lines), 2)
 
+    def test_0020_import_sale_order_with_exception(self):
+        """
+        Tests if exception is created for sale order when order total mismatch
+        """
+        Sale = POOL.get('sale.sale')
+        Party = POOL.get('party.party')
+        Product = POOL.get('product.product')
+        ChannelException = POOL.get('channel.exception')
+
+        with Transaction().start(DB_NAME, USER, CONTEXT):
+            self.setup_defaults()
+
+            with Transaction().set_context({
+                'current_channel': self.ebay_channel.id,
+                'company': self.company
+            }):
+
+                orders = Sale.search([])
+                self.assertEqual(len(orders), 0)
+
+                order_data = load_json(
+                    'orders', '110122281466-0'
+                )['OrderArray']['Order']
+
+                Party.create_using_ebay_data(
+                    load_json('users', 'testuser_shalabhopenlabs')
+                )
+
+                Product.create_using_ebay_data(
+                    load_json('products', '110122281466')
+                )
+
+                self.assertEqual(order_data['Total']['value'], '4.5')
+
+                self.assertFalse(ChannelException.search([]))
+
+                # Lets Change order total to make it raise exception
+                order_data['Total']['value'] = '8.5'
+
+                order = Sale.create_using_ebay_data(order_data)
+
+                self.assertTrue(ChannelException.search([]))
+
+                self.assertTrue(order.has_channel_exception)
+
+                self.assertNotEqual(order.state, 'confirmed')
+
+                orders = Sale.search([])
+                self.assertEqual(len(orders), 1)
+
+                # Item lines + shipping line should be equal to lines on tryton
+                self.assertEqual(len(order.lines), 2)
+
 
 def suite():
     """
