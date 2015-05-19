@@ -28,6 +28,28 @@ class Party:
     )
 
     @classmethod
+    def validate(cls, parties):
+        """
+        Validate sale channel
+        """
+        super(Party, cls).validate(parties)
+
+        for party in parties:
+            party.check_unique_ebay_user_id()
+
+    def check_unique_ebay_user_id(self):
+        """
+        Check if ebay user id is unique for each party
+        """
+        if not self.ebay_user_id:
+            return
+        if self.search([
+            ('ebay_user_id', '=', self.ebay_user_id),
+            ('id', '!=', self.id)
+        ]):
+            self.raise_user_error('unique_ebay_user_id')
+
+    @classmethod
     def __setup__(cls):
         """
         Setup the class before adding to pool
@@ -35,15 +57,8 @@ class Party:
         super(Party, cls).__setup__()
         cls._error_messages.update({
             'account_not_found': 'eBay Account does not exist in context',
+            'unique_ebay_user_id': 'eBay User ID must be unique for party',
         })
-
-        cls._sql_constraints += [
-            (
-                'unique_ebay_user_id',
-                'UNIQUE(ebay_user_id)',
-                'eBay User ID must be unique for party'
-            )
-        ]
 
     @classmethod
     def find_or_create_using_ebay_id(cls, ebay_user_id, item_id=None):
