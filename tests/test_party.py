@@ -222,6 +222,45 @@ class TestParty(TestBase):
                 )
             )
 
+    def test0050_check_unique_ebay_user_id(self):
+        """
+        Tests if error is raised for duplicate ebay user id for party
+        """
+        with Transaction().start(DB_NAME, USER, CONTEXT):
+
+            self.setup_defaults()
+
+            # Create party with ebay user ID as None
+            party1, = self.Party.create([{
+                'name': 'Test Party 1',
+                'ebay_user_id': None
+            }])
+
+            self.assert_(party1)
+
+            # Create party with ebay user ID as None again
+            # Should not raise error
+            party2, = self.Party.create([{
+                'name': 'Test Party 2',
+                'ebay_user_id': None
+            }])
+            self.assert_(party2)
+
+            # Create party with ebay user ID
+            party3, = self.Party.create([{
+                'name': 'Test Party 3',
+                'ebay_user_id': 'EBAYTEST',
+            }])
+            self.assert_(party3)
+
+            # Create party with same ebay user ID again
+            # Should raise error
+            with self.assertRaises(UserError):
+                party4, = self.Party.create([{
+                    'name': 'Test Party 4',
+                    'ebay_user_id': 'EBAYTEST',
+                }])
+
 
 def suite():
     """
