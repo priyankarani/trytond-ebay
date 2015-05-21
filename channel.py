@@ -160,16 +160,6 @@ class SaleChannel:
         if self.source != 'ebay':
             self.raise_user_error("invalid_channel")
 
-    @classmethod
-    def import_ebay_orders_using_cron(cls):
-        """
-        Cron method to import ebay orders
-        """
-        channels = cls.search([('source', '=', 'ebay')])
-
-        for channel in channels:
-            channel.import_orders()
-
     def import_orders(self):
         """
         Downstream implementation of channel.import_orders
