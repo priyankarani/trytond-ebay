@@ -61,15 +61,21 @@ class TestSale(TestBase):
                     load_json('products', '110122281466')
                 )
 
-                order = Sale.create_using_ebay_data(order_data)
+                order1 = self.ebay_channel.import_order(order_data)
 
-                self.assertEqual(order.state, 'confirmed')
+                self.assertEqual(order1.state, 'confirmed')
 
                 orders = Sale.search([])
                 self.assertEqual(len(orders), 1)
 
                 # Item lines + shipping line should be equal to lines on tryton
-                self.assertEqual(len(order.lines), 2)
+                self.assertEqual(len(order1.lines), 2)
+
+                order2 = self.ebay_channel.import_order(order_data)
+                orders = Sale.search([])
+                self.assertEqual(len(orders), 1)
+
+                self.assertEqual(order1, order2)
 
     def test_0020_import_sale_order_with_exception(self):
         """
@@ -110,7 +116,7 @@ class TestSale(TestBase):
                 # Lets Change order total to make it raise exception
                 order_data['Total']['value'] = '8.5'
 
-                order = Sale.create_using_ebay_data(order_data)
+                order = self.ebay_channel.import_order(order_data)
 
                 self.assertTrue(ChannelException.search([]))
 

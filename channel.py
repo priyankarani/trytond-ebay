@@ -11,15 +11,14 @@ from dateutil.relativedelta import relativedelta
 
 from ebaysdk.trading import Connection as trading
 from trytond.transaction import Transaction
-from trytond.wizard import Wizard, StateView, Button, StateAction
+from trytond.wizard import Wizard, StateView, Button
 from trytond.model import ModelView, fields
 from trytond.pool import Pool, PoolMeta
-from trytond.pyson import Eval, PYSONEncoder
+from trytond.pyson import Eval
 
 
 __all__ = [
     'SaleChannel', 'CheckEbayTokenStatusView', 'CheckEbayTokenStatus',
-    'ImportEbayOrders', 'ImportEbayOrdersView'
 ]
 __metaclass__ = PoolMeta
 
@@ -100,7 +99,6 @@ class SaleChannel:
         })
         cls._buttons.update({
             'check_ebay_token_status': {},
-            'import_ebay_orders_button': {},
         })
 
     @classmethod
@@ -155,14 +153,6 @@ class SaleChannel:
         """
         pass
 
-    @classmethod
-    @ModelView.button_action('ebay.wizard_import_ebay_orders')
-    def import_ebay_orders_button(cls, channels):
-        """
-        Import orders for current account
-        """
-        pass
-
     def validate_ebay_channel(self):
         """
         Check if current channel belongs to ebay
@@ -178,14 +168,15 @@ class SaleChannel:
         channels = cls.search([('source', '=', 'ebay')])
 
         for channel in channels:
-            channel.import_ebay_orders()
+            channel.import_orders()
 
-    def import_ebay_orders(self):
+    def import_orders(self):
         """
-        Imports orders for current channel
-
+        Downstream implementation of channel.import_orders
+        :return: List of active record of sale imported
         """
-        Sale = Pool().get('sale.sale')
+        if self.source != 'ebay':
+            return super(SaleChannel, self).import_orders()
 
         self.validate_ebay_channel()
 
@@ -219,9 +210,24 @@ class SaleChannel:
 
         with Transaction().set_context({'current_channel': self.id}):
             for order_data in orders:
-                sales.append(Sale.create_using_ebay_data(order_data))
+                sales.append(self.import_order(order_data))
 
         return sales
+
+    def import_order(self, order_data):
+        "Downstream implementation of channel.import_order from sale channel"
+        if self.source != 'ebay':
+            return super(SaleChannel, self).import_order(order_data)
+
+        Sale = Pool().get('sale.sale')
+
+        sales = Sale.search([
+            ('ebay_order_id', '=', order_data['OrderID']['value']),
+        ])
+        if sales:
+            return sales[0]
+
+        return Sale.create_using_ebay_data(order_data)
 
 
 class CheckEbayTokenStatusView(ModelView):
@@ -267,58 +273,3 @@ class CheckEbayTokenStatus(Wizard):
                 response['TokenStatus']['ExpirationTime']
             ),
         }
-
-
-class ImportEbayOrdersView(ModelView):
-    "Import Orders View"
-    __name__ = 'channel.ebay.import_orders.view'
-
-    message = fields.Text("Message", readonly=True)
-
-
-class ImportEbayOrders(Wizard):
-    """
-    Import Orders Wizard
-
-    Import orders for the current ebay channel
-    """
-    __name__ = 'channel.ebay.import_orders'
-
-    start = StateView(
-        'channel.ebay.import_orders.view',
-        'ebay.import_ebay_orders_view_form',
-        [
-            Button('Cancel', 'end', 'tryton-cancel'),
-            Button('Continue', 'import_', 'tryton-ok', default=True),
-        ]
-    )
-
-    import_ = StateAction('sale.act_sale_form')
-
-    def default_start(self, data):
-        """
-        Sets default data for wizard
-        """
-        return {
-            'message':
-                'This wizard will import orders for this channel ' +
-                'It imports orders updated after Last Order Import Time.'
-        }
-
-    def do_import_(self, action):
-        """
-        Import eBay orders for current channel
-        """
-        SaleChannel = Pool().get('sale.channel')
-
-        ebay_channel = SaleChannel(Transaction().context.get('active_id'))
-
-        sales = ebay_channel.import_ebay_orders()
-
-        action['pyson_domain'] = PYSONEncoder().encode([
-            ('id', 'in', map(int, sales))
-        ])
-        return action, {}
-
-    def transition_import_(self):
-        return 'end'
