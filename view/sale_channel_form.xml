@@ -23,7 +23,6 @@
             <group id="ebay_buttons" col="2" colspan="4"
                     states="{'invisible': Not(Eval('source') == 'ebay')}">
                 <button string="Check eBay Token Status" name="check_ebay_token_status"/>
-                <button string="Import eBay Orders" name="import_ebay_orders_button"/>
             </group>
         </page>
     </xpath>

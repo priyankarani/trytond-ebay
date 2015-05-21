@@ -22,19 +22,6 @@
             <field name="name">wizard_check_ebay_token_status_view_form</field>
         </record>
 
-        <!--Import ebay orders wizard-->
-        <record model="ir.action.wizard" id="wizard_import_ebay_orders">
-            <field name="name">Import eBay Orders</field>
-            <field name="wiz_name">channel.ebay.import_orders</field>
-            <field name="model">sale.channel</field>
-        </record>
-
-        <record model="ir.ui.view" id="import_ebay_orders_view_form">
-            <field name="model">channel.ebay.import_orders.view</field>
-            <field name="type">form</field>
-            <field name="name">wizard_import_ebay_orders_view_form</field>
-        </record>
-
         <!--Cron To Import Orders-->
         <record model="ir.cron" id="cron_import_ebay_orders">
             <field name="name">Import eBay Orders</field>
