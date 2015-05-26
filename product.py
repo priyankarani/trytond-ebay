@@ -100,8 +100,6 @@ class Product:
             'default_uom': ebay_channel.default_uom.id,
             'salable': True,
             'sale_uom': ebay_channel.default_uom.id,
-            'account_expense': ebay_channel.default_account_expense.id,
-            'account_revenue': ebay_channel.default_account_revenue.id,
         }
 
     @classmethod

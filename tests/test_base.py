@@ -253,15 +253,13 @@ class TestBase(unittest.TestCase):
             'ebay_token': 'a long test token by ebay',
             'is_ebay_sandbox': True,
             'default_uom': self.uom.id,
-            'default_account_expense': self.get_account_by_kind('expense'),
-            'default_account_revenue': self.get_account_by_kind('revenue'),
         }])
 
         # TODO: This should work without creating new properties
         self.Property.create([{
-            'value':
-                'account.account' + ',' +
-                str(self.ebay_channel.default_account_revenue.id),
+            'value': '%s,%s' % (
+                'account.account', self.get_account_by_kind('revenue')
+            ),
             'res': None,
             'field': model_field.id,
         }])
