@@ -219,6 +219,44 @@ class SaleChannel:
 
         return Sale.create_using_ebay_data(order_data)
 
+    def import_products(self):
+        """
+        Import products for this ebay channel
+        Downstream implementation for channel.import_products
+        """
+        if self.source != 'ebay':
+            return super(SaleChannel, self).import_products()
+
+        # TODO: Allow products to be imported independently
+
+    def import_product(self, ebay_id):
+        """
+        Import specific product for this ebay channel
+        Downstream implementation for channel.import_product
+        """
+        Product = Pool().get('product.product')
+
+        # TODO: Products need to be searched using SKU instead of ebay ID
+
+        if self.source != 'ebay':
+            return super(SaleChannel, self).import_product(ebay_id)
+
+        products = Product.search([('ebay_item_id', '=', ebay_id)])
+
+        if products:
+            return products[0]
+
+        # If product is not found get the info from ebay and
+        # delegate to create_using_ebay_data
+        self.validate_ebay_channel()
+        api = self.get_ebay_trading_api()
+
+        product_data = api.execute(
+            'GetItem', {'ItemID': ebay_id, 'DetailLevel': 'ReturnAll'}
+        ).dict()
+
+        return Product.create_using_ebay_data(product_data)
+
 
 class CheckEbayTokenStatusView(ModelView):
     "Check Token Status View"
