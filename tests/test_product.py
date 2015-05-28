@@ -78,7 +78,7 @@ class TestProduct(TestBase):
 
                 ebay_data = load_json('products', '110122328573')
 
-                # Create party
+                # Create product
                 product = Product.create_using_ebay_data(
                     ebay_data
                 )
