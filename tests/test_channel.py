@@ -48,8 +48,6 @@ class TestChannel(TestBase):
                 'ebay_token': None,
                 'is_ebay_sandbox': False,
                 'default_uom': self.uom.id,
-                'default_account_expense': self.get_account_by_kind('expense'),
-                'default_account_revenue': self.get_account_by_kind('revenue'),
             }])
 
             # Manual channel again with none values should not raise error
@@ -69,8 +67,6 @@ class TestChannel(TestBase):
                 'ebay_token': None,
                 'is_ebay_sandbox': False,
                 'default_uom': self.uom.id,
-                'default_account_expense': self.get_account_by_kind('expense'),
-                'default_account_revenue': self.get_account_by_kind('revenue'),
             }])
 
             # eBay channel with credentials
@@ -90,8 +86,6 @@ class TestChannel(TestBase):
                 'ebay_token': 'a long test token',
                 'is_ebay_sandbox': True,
                 'default_uom': self.uom.id,
-                'default_account_expense': self.get_account_by_kind('expense'),
-                'default_account_revenue': self.get_account_by_kind('revenue'),
             }])
 
             # eBay channel with same credentials again should raise error
@@ -112,10 +106,6 @@ class TestChannel(TestBase):
                     'ebay_token': 'a long test token',
                     'is_ebay_sandbox': True,
                     'default_uom': self.uom.id,
-                    'default_account_expense':
-                        self.get_account_by_kind('expense'),
-                    'default_account_revenue':
-                        self.get_account_by_kind('revenue'),
                 }])
 
 

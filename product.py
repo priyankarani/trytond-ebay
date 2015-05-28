@@ -48,35 +48,6 @@ class Product:
         ]
 
     @classmethod
-    def find_or_create_using_ebay_id(cls, ebay_id):
-        """
-        Find or create a product using ebay ID. This method looks
-        for an existing product using the ebay ID provided. If found, it
-        returns the product found, else creates a new one and returns that
-
-        :param ebay_id: Product ID from eBay
-        :returns: Active record of Product Created
-        """
-        SaleChannel = Pool().get('sale.channel')
-
-        products = cls.search([('ebay_item_id', '=', ebay_id)])
-
-        if products:
-            return products[0]
-
-        # if product is not found get the info from ebay and
-        # delegate to create_using_ebay_data
-        ebay_channel = SaleChannel(Transaction().context['current_channel'])
-        ebay_channel.validate_ebay_channel()
-        api = ebay_channel.get_ebay_trading_api()
-
-        product_data = api.execute(
-            'GetItem', {'ItemID': ebay_id, 'DetailLevel': 'ReturnAll'}
-        ).dict()
-
-        return cls.create_using_ebay_data(product_data)
-
-    @classmethod
     def extract_product_values_from_ebay_data(cls, product_data):
         """
         Extract product values from the ebay data, used for
@@ -100,8 +71,6 @@ class Product:
             'default_uom': ebay_channel.default_uom.id,
             'salable': True,
             'sale_uom': ebay_channel.default_uom.id,
-            'account_expense': ebay_channel.default_account_expense.id,
-            'account_revenue': ebay_channel.default_account_revenue.id,
         }
 
     @classmethod
