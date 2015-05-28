@@ -198,9 +198,13 @@ class Sale:
         :return: List of data of order lines in required format
         """
         Uom = Pool().get('product.uom')
-        Product = Pool().get('product.product')
+        SaleChannel = Pool().get('sale.channel')
 
         unit, = Uom.search([('name', '=', 'Unit')])
+
+        ebay_channel = SaleChannel(Transaction().context['current_channel'])
+
+        ebay_channel.validate_ebay_channel()
 
         line_data = []
         # In case of single item order, TransactionArray will not be a list
@@ -218,7 +222,7 @@ class Sale:
                 'quantity': Decimal(
                     item['Transaction']['QuantityPurchased']['value']
                 ),
-                'product': Product.find_or_create_using_ebay_id(
+                'product': ebay_channel.import_product(
                     item['Transaction']['Item']['ItemID']['value'],
                 ).id
             }

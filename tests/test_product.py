@@ -58,10 +58,7 @@ class TestProduct(TestBase):
                 self.assertTrue(products_after_import > products_before_import)
 
                 self.assertEqual(
-                    product,
-                    Product.find_or_create_using_ebay_id(
-                        '110122328573'
-                    )
+                    product, self.ebay_channel.import_product('110122328573')
                 )
 
     def test0020_create_product_duplicate(self):
