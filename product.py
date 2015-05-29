@@ -5,6 +5,7 @@
     :copyright: (c) 2013-2015 by Openlabs Technologies & Consulting (P) Limited
     :license: GPLv3, see LICENSE for more details.
 '''
+from trytond import backend
 from trytond.model import fields
 from trytond.transaction import Transaction
 from trytond.pool import PoolMeta, Pool
@@ -30,6 +31,39 @@ class Product:
     )
 
     @classmethod
+    def validate(cls, products):
+        """
+        Validate sale channel
+        """
+        super(Product, cls).validate(products)
+
+        for product in products:
+            product.check_unique_ebay_item_id()
+
+    def check_unique_ebay_item_id(self):
+        """
+        Check if ebay user id is unique for each product
+        """
+        if not self.ebay_item_id:
+            return
+        if self.search([
+            ('ebay_item_id', '=', self.ebay_item_id),
+            ('id', '!=', self.id)
+        ]):
+            self.raise_user_error('unique_ebay_item_id')
+
+    @classmethod
+    def __register__(cls, module_name):
+        super(Product, cls).__register__(module_name)
+
+        TableHandler = backend.get('TableHandler')
+        cursor = Transaction().cursor
+        table = TableHandler(cursor, cls, module_name)
+
+        # Migration
+        table.drop_constraint('unique_product_ebay_item_id')
+
+    @classmethod
     def __setup__(cls):
         """
         Setup the class before adding to pool
@@ -37,15 +71,8 @@ class Product:
         super(Product, cls).__setup__()
         cls._error_messages.update({
             "missing_product_code": 'Product "%s" has a missing code.',
+            'unique_ebay_item_id': 'eBay Item ID must be unique for product',
         })
-
-        cls._sql_constraints += [
-            (
-                'unique_product_ebay_item_id',
-                'UNIQUE(ebay_item_id)',
-                'eBay Item ID must be unique for each product'
-            )
-        ]
 
     @classmethod
     def extract_product_values_from_ebay_data(cls, product_data):

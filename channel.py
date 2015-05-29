@@ -219,16 +219,6 @@ class SaleChannel:
 
         return Sale.create_using_ebay_data(order_data)
 
-    def import_products(self):
-        """
-        Import products for this ebay channel
-        Downstream implementation for channel.import_products
-        """
-        if self.source != 'ebay':
-            return super(SaleChannel, self).import_products()
-
-        # TODO: Allow products to be imported independently
-
     def import_product(self, ebay_id):
         """
         Import specific product for this ebay channel
