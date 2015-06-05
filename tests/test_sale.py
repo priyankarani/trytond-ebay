@@ -50,15 +50,18 @@ class TestSale(TestBase):
                 self.assertEqual(len(orders), 0)
 
                 order_data = load_json(
-                    'orders', '110122281466-0'
-                )['OrderArray']['Order']
+                    'orders', '283054010'
+                )['OrderArray']['Order'][0]
 
                 Party.create_using_ebay_data(
-                    load_json('users', 'testuser_shalabhopenlabs')
+                    load_json('users', 'testuser_ritu123')
                 )
 
                 Product.create_using_ebay_data(
-                    load_json('products', '110122281466')
+                    load_json('products', '110162956809')
+                )
+                Product.create_using_ebay_data(
+                    load_json('products', '110162957156')
                 )
 
                 order1 = self.ebay_channel.import_order(order_data)
@@ -69,7 +72,7 @@ class TestSale(TestBase):
                 self.assertEqual(len(orders), 1)
 
                 # Item lines + shipping line should be equal to lines on tryton
-                self.assertEqual(len(order1.lines), 2)
+                self.assertEqual(len(order1.lines), 3)
 
                 order2 = self.ebay_channel.import_order(order_data)
                 orders = Sale.search([])
@@ -98,18 +101,21 @@ class TestSale(TestBase):
                 self.assertEqual(len(orders), 0)
 
                 order_data = load_json(
-                    'orders', '110122281466-0'
-                )['OrderArray']['Order']
+                    'orders', '283054010'
+                )['OrderArray']['Order'][0]
 
                 Party.create_using_ebay_data(
-                    load_json('users', 'testuser_shalabhopenlabs')
+                    load_json('users', 'testuser_ritu123')
                 )
 
                 Product.create_using_ebay_data(
-                    load_json('products', '110122281466')
+                    load_json('products', '110162956809')
+                )
+                Product.create_using_ebay_data(
+                    load_json('products', '110162957156')
                 )
 
-                self.assertEqual(order_data['Total']['value'], '4.5')
+                self.assertEqual(order_data['Total']['value'], '4.0')
 
                 self.assertFalse(ChannelException.search([]))
 
@@ -128,7 +134,7 @@ class TestSale(TestBase):
                 self.assertEqual(len(orders), 1)
 
                 # Item lines + shipping line should be equal to lines on tryton
-                self.assertEqual(len(order.lines), 2)
+                self.assertEqual(len(order.lines), 3)
 
 
 def suite():

@@ -46,19 +46,19 @@ class TestProduct(TestBase):
 
                 products_before_import = Product.search([], count=True)
 
-                product_data = load_json('products', '110122328573')
+                product_data = load_json('products', '110162956809')
                 product = Product.create_using_ebay_data(
                     product_data
                 )
                 self.assertEqual(
-                    product.template.name, 'This is some sort of a test book'
+                    product.template.name, 'Iphone'
                 )
 
                 products_after_import = Product.search([], count=True)
                 self.assertTrue(products_after_import > products_before_import)
 
                 self.assertEqual(
-                    product, self.ebay_channel.import_product('110122328573')
+                    product, self.ebay_channel.import_product('110162956809')
                 )
 
     def test0020_create_product_duplicate(self):
@@ -76,7 +76,7 @@ class TestProduct(TestBase):
                 'company': self.company,
             }):
 
-                ebay_data = load_json('products', '110122328573')
+                ebay_data = load_json('products', '110162956809')
 
                 # Create product
                 product = Product.create_using_ebay_data(

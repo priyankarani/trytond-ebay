@@ -1,1 +1,15 @@
-{ "__comment__": "Address similar to 1a but with different country and state",  "CityName": {"value": "city"},  "Country": {"value": "US"},  "CountryName": {"value": "United States"},  "Name": {"value": "Test User"},  "Phone": {"value": "1-800-111-1111"},  "PostalCode": {"value": "110034"},  "StateOrProvince": {"value": "NY"},  "Street": {"value": "address"},  "Street1": {"value": "address"}}
+{
+    "__comment__": "Address similar to 1a but with different country and state", 
+    "AddressOwner": "eBay", 
+    "Name": "Test User", 
+    "AddressID": "7569425", 
+    "Phone": "1 800 111 1111", 
+    "Street1": "address", 
+    "Street2": null, 
+    "CityName": "city", 
+    "CountryName": "INDIA", 
+    "ExternalAddressID": null, 
+    "Country": "IN", 
+    "PostalCode": "98102", 
+    "StateOrProvince": "UP"
+}
