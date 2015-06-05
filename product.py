@@ -90,11 +90,6 @@ class Product:
         ebay_channel.validate_ebay_channel()
         return {
             'name': product_data['Item']['Title'],
-            'list_price': Decimal(
-                product_data['Item']['BuyItNowPrice']['value'] or
-                product_data['Item']['StartPrice']['value']
-            ),
-            'cost_price': Decimal(product_data['Item']['StartPrice']['value']),
             'default_uom': ebay_channel.default_uom.id,
             'salable': True,
             'sale_uom': ebay_channel.default_uom.id,
@@ -118,6 +113,12 @@ class Product:
             'products': [('create', [{
                 'ebay_item_id': product_data['Item']['ItemID'],
                 'description': product_data['Item']['Description'],
+                'list_price': Decimal(
+                    product_data['Item']['BuyItNowPrice']['value'] or
+                    product_data['Item']['StartPrice']['value']
+                ),
+                'cost_price':
+                    Decimal(product_data['Item']['StartPrice']['value']),
                 'code':
                     product_data['Item'].get('SKU', None) and
                     product_data['Item']['SKU'] or None,
