@@ -83,7 +83,8 @@ requires = [
     'ebaysdk>=2.1',
 ]
 MODULE2PREFIX = {
-    'sale_channel': 'openlabs'
+    'sale_channel': 'openlabs',
+    'product_variant': 'openlabs',
 }
 MODULE = "ebay"
 PREFIX = "trytond"
