@@ -114,11 +114,12 @@ class Party:
             # name of buyer or someone else.
             # Hence, we use UserID for both name and ebay_user_id.
             # This allows the user a flexibility to edit the name later
-            'name': ebay_data['User']['UserID']['value'],
-            'ebay_user_id': ebay_data['User']['UserID']['value'],
+            'name': ebay_data['User']['UserID'],
+            'ebay_user_id': ebay_data['User']['UserID'],
             'contact_mechanisms': [
                 ('create', [{
-                    'email': ebay_data['User']['Email']['value']
+                    # TODO: Handle invalid request
+                    'email': ebay_data['User']['Email']
                 }])
             ]
         }])[0]
@@ -150,22 +151,21 @@ class Party:
         Subdivision = Pool().get('country.subdivision')
 
         country, = Country.search([
-            ('code', '=', address_data['Country']['value'])
+            ('code', '=', address_data['Country'])
         ], limit=1)
         subdivision = Subdivision.search_using_ebay_state(
-            address_data['StateOrProvince']['value'], country
+            address_data['StateOrProvince'], country
         )
 
         return Address(
             party=self.id,
-            name=address_data['Name']['value'],
-            street=address_data['Street1']['value'],
+            name=address_data['Name'],
+            street=address_data['Street1'],
             streetbis=(
-                address_data.get('Street2') and
-                address_data['Street2'].get('value') or None
+                address_data.get('Street2') or None
             ),
-            zip=address_data['PostalCode']['value'],
-            city=address_data['CityName']['value'],
+            zip=address_data['PostalCode'],
+            city=address_data['CityName'],
             country=country.id,
             subdivision=subdivision.id,
         )
