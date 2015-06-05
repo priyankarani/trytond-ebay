@@ -1,1 +1,15 @@
-{ "__comment__": "Address same as 1a but with different street",  "CityName": {"value": "city"},  "Country": {"value": "IN"},  "CountryName": {"value": "India"},  "Name": {"value": "Test User"},  "Phone": {"value": "1-800-111-1111"},  "PostalCode": {"value": "110034"},  "StateOrProvince": {"value": "NEW DELHI"},  "Street": {"value": "address different"},  "Street1": {"value": "address different"}}
+{
+    "__comment__": "Address same as 1a but with different street", 
+    "AddressOwner": "eBay", 
+    "Name": "Test User", 
+    "AddressID": "7569425", 
+    "Phone": "1 800 111 1111", 
+    "Street1": "address different", 
+    "Street2": "address different", 
+    "CityName": "city", 
+    "CountryName": "United States", 
+    "ExternalAddressID": null, 
+    "Country": "US", 
+    "PostalCode": "98102", 
+    "StateOrProvince": "WA"
+}

@@ -89,7 +89,7 @@ class Product:
         ebay_channel = SaleChannel(Transaction().context['current_channel'])
         ebay_channel.validate_ebay_channel()
         return {
-            'name': product_data['Item']['Title']['value'],
+            'name': product_data['Item']['Title'],
             'list_price': Decimal(
                 product_data['Item']['BuyItNowPrice']['value'] or
                 product_data['Item']['StartPrice']['value']
@@ -116,11 +116,11 @@ class Product:
 
         product_values.update({
             'products': [('create', [{
-                'ebay_item_id': product_data['Item']['ItemID']['value'],
-                'description': product_data['Item']['Description']['value'],
+                'ebay_item_id': product_data['Item']['ItemID'],
+                'description': product_data['Item']['Description'],
                 'code':
                     product_data['Item'].get('SKU', None) and
-                    product_data['Item']['SKU']['value'],
+                    product_data['Item']['SKU'] or None,
             }])],
         })
 

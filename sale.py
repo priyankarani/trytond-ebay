@@ -111,20 +111,21 @@ class Sale:
         ebay_channel.validate_ebay_channel()
 
         currency, = Currency.search([
-            ('code', '=', order_data['Total']['currencyID']['value'])
+            ('code', '=', order_data['Total']['_currencyID'])
         ], limit=1)
 
-        # Transaction Array is similar to order lines
+        # Transaction is similar to order lines
         # In the if..else below we fetch the first item from the array to
         # get the item which will be used to establish a relationship
         # between seller and buyer.
-        if isinstance(order_data['TransactionArray'], dict):
+        transaction = order_data['TransactionArray']['Transaction']
+        if isinstance(transaction, dict):
             # If its a single line order, then the array will be dict
-            item = order_data['TransactionArray']
+            item = transaction
         else:
             # In case of multi line orders, the transaction array will be
             # a list of dictionaries
-            item = order_data['TransactionArray'][0]
+            item = transaction[0]
 
         # Get an item ID so that ebay can establish a relationship between
         # seller and buyer.
@@ -133,13 +134,13 @@ class Sale:
         # a seller-buyer relationship between both via some item.
         # If this item is not passed, then ebay would not return important
         # informations like eMail etc.
-        item_id = item['Transaction']['Item']['ItemID']['value']
+        item_id = item['Item']['ItemID']
         party = Party.find_or_create_using_ebay_id(
-            order_data['BuyerUserID']['value'], item_id=item_id
+            order_data['BuyerUserID'], item_id=item_id
         )
 
         party.add_phone_using_ebay_data(
-            order_data['ShippingAddress']['Phone']['value']
+            order_data['ShippingAddress']['Phone']
         )
 
         party_invoice_address = party_shipping_address = \
@@ -149,15 +150,15 @@ class Sale:
         unit, = Uom.search([('name', '=', 'Unit')])
 
         sale_data = {
-            'reference': order_data['OrderID']['value'],
+            'reference': order_data['OrderID'],
             'sale_date': dateutil.parser.parse(
-                order_data['CreatedTime']['value'].split()[0]
+                order_data['CreatedTime'].split()[0]
             ).date(),
             'party': party.id,
             'currency': currency.id,
             'invoice_address': party_invoice_address.id,
             'shipment_address': party_shipping_address.id,
-            'ebay_order_id': order_data['OrderID']['value'],
+            'ebay_order_id': order_data['OrderID'],
             'lines': cls.get_item_line_data_using_ebay_data(order_data),
             'channel': ebay_channel.id,
         }
@@ -207,23 +208,26 @@ class Sale:
         ebay_channel.validate_ebay_channel()
 
         line_data = []
-        # In case of single item order, TransactionArray will not be a list
-        if isinstance(order_data['TransactionArray'], dict):
-            items = [order_data['TransactionArray']]
+        transaction = order_data['TransactionArray']['Transaction']
+        if isinstance(transaction, dict):
+            # If its a single line order, then the transaction will be dict
+            items = [transaction]
         else:
-            items = order_data['TransactionArray']
+            # In case of multi line orders, the transaction will be
+            # a list of dictionaries
+            items = transaction
         for item in items:
             values = {
-                'description': item['Transaction']['Item']['Title']['value'],
+                'description': item['Item']['Title'],
                 'unit_price': Decimal(
-                    item['Transaction']['TransactionPrice']['value']
+                    item['TransactionPrice']['value']
                 ),
                 'unit': unit.id,
                 'quantity': Decimal(
-                    item['Transaction']['QuantityPurchased']['value']
+                    item['QuantityPurchased']
                 ),
                 'product': ebay_channel.import_product(
-                    item['Transaction']['Item']['ItemID']['value'],
+                    item['Item']['ItemID'],
                 ).id
             }
             line_data.append(('create', [values]))
@@ -254,6 +258,6 @@ class Sale:
             'note': order_data['ShippingServiceSelected'].get(
                 'ShippingService', None
             ) and order_data[
-                'ShippingServiceSelected']['ShippingService']['value'],
+                'ShippingServiceSelected']['ShippingService'],
             'quantity': 1,
         }])

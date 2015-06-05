@@ -212,7 +212,7 @@ class SaleChannel:
         Sale = Pool().get('sale.sale')
 
         sales = Sale.search([
-            ('ebay_order_id', '=', order_data['OrderID']['value']),
+            ('ebay_order_id', '=', order_data['OrderID']),
         ])
         if sales:
             return sales[0]

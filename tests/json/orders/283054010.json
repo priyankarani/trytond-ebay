@@ -1,0 +1,255 @@
+{
+    "Ack": "Success", 
+    "Timestamp": "2015-06-04T23:49:38.288Z", 
+    "ReturnedOrderCountActual": "1", 
+    "Version": "921", 
+    "OrdersPerPage": "100", 
+    "Build": "E921_CORE_API_17506731_R1", 
+    "PageNumber": "1", 
+    "PaginationResult": {
+        "TotalNumberOfPages": "1", 
+        "TotalNumberOfEntries": "1"
+    }, 
+    "OrderArray": {
+        "Order": [
+            {
+                "OrderID": "283054010", 
+                "ShippingAddress": {
+                    "AddressOwner": "eBay", 
+                    "Name": "Test User", 
+                    "AddressID": "7569425", 
+                    "Phone": "1 800 111 1111", 
+                    "Street1": "address", 
+                    "Street2": null, 
+                    "CityName": "city", 
+                    "CountryName": "United States", 
+                    "ExternalAddressID": null, 
+                    "Country": "US", 
+                    "PostalCode": "98102", 
+                    "StateOrProvince": "WA"
+                }, 
+                "PaymentHoldStatus": "None", 
+                "SellerEmail": "tarun.bhardwaj.06@gmail.com", 
+                "Subtotal": {
+                    "_currencyID": "USD", 
+                    "value": "4.0"
+                }, 
+                "EIASToken": "nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4GhDZeEog2dj6x9nY+seQ==", 
+                "AdjustmentAmount": {
+                    "_currencyID": "USD", 
+                    "value": "0.0"
+                }, 
+                "IntegratedMerchantCreditCardEnabled": "false", 
+                "ShippingServiceSelected": {
+                    "ShippingService": "Other", 
+                    "ShippingServiceCost": {
+                        "_currencyID": "USD", 
+                        "value": "0.0"
+                    }
+                }, 
+                "CheckoutStatus": {
+                    "Status": "Complete", 
+                    "eBayPaymentStatus": "NoPaymentFailure", 
+                    "LastModifiedTime": "2015-06-04T10:32:22.000Z", 
+                    "PaymentMethod": "CCAccepted", 
+                    "IntegratedMerchantCreditCardEnabled": "false"
+                }, 
+                "IsMultiLegShipping": "false", 
+                "CreatedTime": "2015-06-04T10:32:22.000Z", 
+                "CreatingUserRole": "Buyer", 
+                "PaymentMethods": "PayPal", 
+                "AmountSaved": {
+                    "_currencyID": "USD", 
+                    "value": "0.0"
+                }, 
+                "TransactionArray": {
+                    "Transaction": [
+                        {
+                            "Status": {
+                                "PaymentHoldStatus": "None"
+                            }, 
+                            "ActualShippingCost": {
+                                "_currencyID": "USD", 
+                                "value": "0.0"
+                            }, 
+                            "ActualHandlingCost": {
+                                "_currencyID": "USD", 
+                                "value": "0.0"
+                            }, 
+                            "TransactionPrice": {
+                                "_currencyID": "USD", 
+                                "value": "2.0"
+                            }, 
+                            "TransactionSiteID": "US", 
+                            "Taxes": {
+                                "TotalTaxAmount": {
+                                    "_currencyID": "USD", 
+                                    "value": "0.0"
+                                }, 
+                                "TaxDetails": [
+                                    {
+                                        "TaxAmount": {
+                                            "_currencyID": "USD", 
+                                            "value": "0.0"
+                                        }, 
+                                        "TaxOnHandlingAmount": {
+                                            "_currencyID": "USD", 
+                                            "value": "0.0"
+                                        }, 
+                                        "Imposition": "SalesTax", 
+                                        "TaxOnShippingAmount": {
+                                            "_currencyID": "USD", 
+                                            "value": "0.0"
+                                        }, 
+                                        "TaxDescription": "SalesTax", 
+                                        "TaxOnSubtotalAmount": {
+                                            "_currencyID": "USD", 
+                                            "value": "0.0"
+                                        }
+                                    }, 
+                                    {
+                                        "TaxAmount": {
+                                            "_currencyID": "USD", 
+                                            "value": "0.0"
+                                        }, 
+                                        "Imposition": "WasteRecyclingFee", 
+                                        "TaxDescription": "ElectronicWasteRecyclingFee"
+                                    }
+                                ]
+                            }, 
+                            "CreatedDate": "2015-06-04T10:14:00.000Z", 
+                            "Item": {
+                                "ItemID": "110162956809", 
+                                "ConditionID": "1000", 
+                                "Site": "US", 
+                                "ConditionDisplayName": "New", 
+                                "Title": "Iphone"
+                            }, 
+                            "Buyer": {
+                                "UserFirstName": null, 
+                                "UserLastName": null, 
+                                "Email": "ritu@openlabs.co.in"
+                            }, 
+                            "QuantityPurchased": "1", 
+                            "Platform": "eBay", 
+                            "TransactionID": "27494506001", 
+                            "OrderLineItemID": "110162956809-27494506001", 
+                            "ShippingDetails": {
+                                "SellingManagerSalesRecordNumber": "100"
+                            }
+                        }, 
+                        {
+                            "Status": {
+                                "PaymentHoldStatus": "None"
+                            }, 
+                            "ActualShippingCost": {
+                                "_currencyID": "USD", 
+                                "value": "0.0"
+                            }, 
+                            "ActualHandlingCost": {
+                                "_currencyID": "USD", 
+                                "value": "0.0"
+                            }, 
+                            "TransactionPrice": {
+                                "_currencyID": "USD", 
+                                "value": "2.0"
+                            }, 
+                            "TransactionSiteID": "US", 
+                            "Taxes": {
+                                "TotalTaxAmount": {
+                                    "_currencyID": "USD", 
+                                    "value": "0.0"
+                                }, 
+                                "TaxDetails": [
+                                    {
+                                        "TaxAmount": {
+                                            "_currencyID": "USD", 
+                                            "value": "0.0"
+                                        }, 
+                                        "TaxOnHandlingAmount": {
+                                            "_currencyID": "USD", 
+                                            "value": "0.0"
+                                        }, 
+                                        "Imposition": "SalesTax", 
+                                        "TaxOnShippingAmount": {
+                                            "_currencyID": "USD", 
+                                            "value": "0.0"
+                                        }, 
+                                        "TaxDescription": "SalesTax", 
+                                        "TaxOnSubtotalAmount": {
+                                            "_currencyID": "USD", 
+                                            "value": "0.0"
+                                        }
+                                    }, 
+                                    {
+                                        "TaxAmount": {
+                                            "_currencyID": "USD", 
+                                            "value": "0.0"
+                                        }, 
+                                        "Imposition": "WasteRecyclingFee", 
+                                        "TaxDescription": "ElectronicWasteRecyclingFee"
+                                    }
+                                ]
+                            }, 
+                            "CreatedDate": "2015-06-04T10:27:56.000Z", 
+                            "Item": {
+                                "ItemID": "110162957156", 
+                                "ConditionID": "1000", 
+                                "Site": "US", 
+                                "ConditionDisplayName": "New", 
+                                "Title": "Iphone"
+                            }, 
+                            "Buyer": {
+                                "UserFirstName": null, 
+                                "UserLastName": null, 
+                                "Email": "ritu@openlabs.co.in"
+                            }, 
+                            "QuantityPurchased": "1", 
+                            "Platform": "eBay", 
+                            "TransactionID": "27494509001", 
+                            "OrderLineItemID": "110162957156-27494509001", 
+                            "ShippingDetails": {
+                                "SellingManagerSalesRecordNumber": "101"
+                            }
+                        }
+                    ]
+                }, 
+                "BuyerUserID": "testuser_ritu123", 
+                "Total": {
+                    "_currencyID": "USD", 
+                    "value": "4.0"
+                }, 
+                "AmountPaid": {
+                    "_currencyID": "USD", 
+                    "value": "4.0"
+                }, 
+                "ShippingDetails": {
+                    "GetItFast": "false", 
+                    "SellingManagerSalesRecordNumber": "102", 
+                    "ShippingServiceOptions": {
+                        "ShippingTimeMax": "10", 
+                        "ShippingServiceCost": {
+                            "_currencyID": "USD", 
+                            "value": "0.0"
+                        }, 
+                        "ShippingServicePriority": "1", 
+                        "ShippingService": "Other", 
+                        "ExpeditedService": "false", 
+                        "ShippingTimeMin": "1"
+                    }, 
+                    "SalesTax": {
+                        "SalesTaxPercent": "0.0", 
+                        "ShippingIncludedInTax": "false", 
+                        "SalesTaxAmount": {
+                            "_currencyID": "USD", 
+                            "value": "0.0"
+                        }, 
+                        "SalesTaxState": null
+                    }
+                }, 
+                "OrderStatus": "Completed"
+            }
+        ]
+    }, 
+    "HasMoreOrders": "false"
+}

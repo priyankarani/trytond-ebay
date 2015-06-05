@@ -39,11 +39,11 @@ class TestParty(TestBase):
 
             self.setup_defaults()
 
-            ebay_data = load_json('users', 'testuser_shalabhaggarwal')
+            ebay_data = load_json('users', 'testuser_ritu123')
 
             self.assertFalse(
                 self.Party.search([
-                    ('name', '=', 'testuser_shalabhaggarwal')
+                    ('name', '=', 'testuser_ritu123')
                 ])
             )
 
@@ -53,11 +53,11 @@ class TestParty(TestBase):
 
             self.assertTrue(
                 self.Party.search([
-                    ('name', '=', 'testuser_shalabhaggarwal')
+                    ('name', '=', 'testuser_ritu123')
                 ])
             )
             party, = self.Party.search([
-                ('name', '=', 'testuser_shalabhaggarwal')
+                ('name', '=', 'testuser_ritu123')
             ])
             self.assertTrue(len(party.contact_mechanisms), 1)
             self.assertTrue(party.contact_mechanisms[0].email)
@@ -76,8 +76,12 @@ class TestParty(TestBase):
             self.setup_defaults()
 
             # Load json of address data
-            ebay_data = load_json('users', 'testuser_shalabhaggarwal')
-            address_data = ebay_data['User']['RegistrationAddress']
+            ebay_data = load_json('users', 'testuser_ritu123')
+
+            order_data = load_json(
+                'orders', '283054010'
+            )['OrderArray']['Order'][0]
+            address_data = order_data['ShippingAddress']
 
             party = self.Party.create_using_ebay_data(ebay_data)
 
@@ -93,17 +97,16 @@ class TestParty(TestBase):
             self.assertEqual(len(party.addresses), 1)
             self.assertEqual(address1.party, party)
             self.assertEqual(
-                address1.name, address_data['Name']['value']
+                address1.name, address_data['Name']
             )
-            self.assertEqual(address1.street, address_data['Street']['value'])
-            self.assertEqual(address1.zip, address_data['PostalCode']['value'])
-            self.assertEqual(address1.city, address_data['CityName']['value'])
+            self.assertEqual(address1.street, address_data['Street1'])
+            self.assertEqual(address1.zip, address_data['PostalCode'])
+            self.assertEqual(address1.city, address_data['CityName'])
             self.assertEqual(
-                address1.country.code, address_data['Country']['value']
+                address1.country.code, address_data['Country']
             )
             self.assertEqual(
-                address1.subdivision.name.lower(),
-                address_data['StateOrProvince']['value'].lower()
+                address1.subdivision.name.lower(), 'washington'
             )
 
             # Try to import same address again. and it wont create new one
@@ -123,8 +126,10 @@ class TestParty(TestBase):
             self.setup_defaults()
 
             # Load json of address data
-            ebay_data = load_json('users', 'testuser_shalabhaggarwal')
-            address_data = ebay_data['User']['RegistrationAddress']
+            order_data = load_json(
+                'orders', '283054010'
+            )['OrderArray']['Order'][0]
+            address_data = order_data['ShippingAddress']
 
             # Check party phone before import
             self.assertFalse(self.party.phone)
@@ -132,7 +137,7 @@ class TestParty(TestBase):
 
             # Add phone to party using ebay data
             self.party.add_phone_using_ebay_data(
-                address_data['Phone']['value']
+                address_data['Phone']
             )
             self.assertTrue(self.party.phone)
 
@@ -141,7 +146,7 @@ class TestParty(TestBase):
             # Add same phone again to party using ebay data, it wont
             # create new one
             self.party.add_phone_using_ebay_data(
-                address_data['Phone']['value']
+                address_data['Phone']
             )
             self.assertEqual(len(self.party.contact_mechanisms), 1)
 
