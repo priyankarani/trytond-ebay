@@ -61,17 +61,6 @@ class SaleChannel:
         }, depends=['source']
     )
 
-    last_ebay_order_import_time = fields.DateTime(
-        'Last eBay Order Import Time', states=EBAY_STATES, depends=['source']
-    )
-
-    @staticmethod
-    def default_last_ebay_order_import_time():
-        """
-        Set default last order import time
-        """
-        return datetime.utcnow() - relativedelta(days=30)
-
     @classmethod
     def get_source(cls):
         """
@@ -174,10 +163,10 @@ class SaleChannel:
         api = self.get_ebay_trading_api()
         now = datetime.utcnow()
 
-        last_import_time = self.last_ebay_order_import_time
+        last_import_time = self.last_order_import_time
 
         # Update current time for order update
-        self.write([self], {'last_ebay_order_import_time': now})
+        self.write([self], {'last_order_import_time': now})
 
         response = api.execute(
             'GetOrders', {
