@@ -7,7 +7,6 @@
 """
 import dateutil.parser
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 
 from ebaysdk.trading import Connection as trading
 from trytond.transaction import Transaction
@@ -72,12 +71,24 @@ class SaleChannel:
 
         return sources
 
+    def get_last_order_import_time_required(self, name):
+        """
+        Change the getter to make last_order_import_time required for ebay
+        """
+        if self.source == 'ebay':
+            return True
+
+        return super(SaleChannel, self).get_last_order_import_time_required(
+            name
+        )
+
     @classmethod
     def __setup__(cls):
         """
         Setup the class before adding to pool
         """
         super(SaleChannel, cls).__setup__()
+
         cls._error_messages.update({
             "no_orders":
                 'No new orders have been placed on eBay for this '
