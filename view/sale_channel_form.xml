@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <data>
     <xpath expr="/form/notebook/page[@id='configuration']/notebook/page[@id='connection']" position="inside">
-        <group id="ebay_connection_settings" col="4" colspan="4" states="{'invisible': Not(Eval('source') == 'ebay')}"> 
+        <group id="ebay_connection_settings"  colspan="8" states="{'invisible': Not(Eval('source') == 'ebay')}"> 
             <label name="ebay_app_id" />
             <field name="ebay_app_id" />
             <label name="ebay_dev_id" />
@@ -11,9 +11,14 @@
             <label name="is_ebay_sandbox" />
             <field name="is_ebay_sandbox" />
             <newline/>
-            <label name="ebay_token" />
-            <field name="ebay_token" colspan="3" />
-            <button string="Check eBay Token Status" name="check_ebay_token_status"/>
+        </group> 
+        <group id="ebay_token"  states="{'invisible': Not(Eval('source') == 'ebay')}">
+            <separator string="Ebay token" id="ebay_token" />
+            <newline/> 
+            <field name="ebay_token" colspan="4" />
+            <group id="ebay_status" homogeneous="1"> 
+                <button string="Check eBay Token Status" name="check_ebay_token_status" />
+            </group>
         </group>
     </xpath>
 </data>
