@@ -103,7 +103,6 @@ class Sale:
         Party = Pool().get('party.party')
         Currency = Pool().get('currency.currency')
         SaleChannel = Pool().get('sale.channel')
-        Uom = Pool().get('product.uom')
         ChannelException = Pool().get('channel.exception')
 
         ebay_channel = SaleChannel(Transaction().context['current_channel'])
@@ -147,7 +146,6 @@ class Sale:
             party.find_or_create_address_using_ebay_data(
                 order_data['ShippingAddress']
             )
-        unit, = Uom.search([('name', '=', 'Unit')])
 
         sale_data = {
             'reference': order_data['OrderID'],
@@ -164,7 +162,7 @@ class Sale:
         }
 
         sale_data['lines'].append(
-            cls.get_shipping_line_data_using_ebay_data(order_data)
+            cls.get_shipping_line_data_using_ebay_data(ebay_channel, order_data)
         )
 
         # TODO: Handle Discounts
@@ -198,10 +196,7 @@ class Sale:
         :param order_data: Order Data from ebay
         :return: List of data of order lines in required format
         """
-        Uom = Pool().get('product.uom')
         SaleChannel = Pool().get('sale.channel')
-
-        unit, = Uom.search([('name', '=', 'Unit')])
 
         ebay_channel = SaleChannel(Transaction().context['current_channel'])
 
@@ -222,7 +217,7 @@ class Sale:
                 'unit_price': Decimal(
                     item['TransactionPrice']['value']
                 ),
-                'unit': unit.id,
+                'unit': ebay_channel.default_uom.id,
                 'quantity': Decimal(
                     item['QuantityPurchased']
                 ),
@@ -235,16 +230,12 @@ class Sale:
         return line_data
 
     @classmethod
-    def get_shipping_line_data_using_ebay_data(cls, order_data):
+    def get_shipping_line_data_using_ebay_data(cls, channel, order_data):
         """
         Create a shipping line for the given sale using ebay data
 
         :param order_data: Order Data from ebay
         """
-        Uom = Pool().get('product.uom')
-
-        unit, = Uom.search([('name', '=', 'Unit')])
-
         return ('create', [{
             'description': 'eBay Shipping and Handling',
             'unit_price': Decimal(
@@ -254,7 +245,7 @@ class Sale:
                     'ShippingServiceSelected'
                 ]['ShippingServiceCost']['value']
             ),
-            'unit': unit.id,
+            'unit': channel.default_uom.id,
             'note': order_data['ShippingServiceSelected'].get(
                 'ShippingService', None
             ) and order_data[
